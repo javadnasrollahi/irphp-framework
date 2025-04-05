@@ -21,16 +21,17 @@
 project/
 │── app/
 │   ├── Controllers/
+│   │   ├── IndexController.php
+│   │   ├── .....php
 │   ├── Models/
+│   │   ├── User.php
+│   │   ├── .....php
 │   ├── Services/
-│   └── Core/
-│── config/
-│   └── config.php
+│   │   ├── ....php
 │── routes/
-│   └── webhook.php
+│   ├── web.php
 │── public/
-│   └── index.php
-│── storage/
+│   ├── index.php
 │── bootstrap.php
 │── .env
 │── composer.json
@@ -42,7 +43,7 @@ project/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/irphp-framework.git
+   git clone https://github.com/javadnasrollahi/irphp-framework.git
    cd irphp-framework
    ```
 
@@ -118,12 +119,12 @@ Supports layout extending and data passing.
 
 ## 🧪 TODO (Future Plans)
 
-- Middleware support
-- CLI command runner
-- Database migrations
-- Dependency injection container
-- REST API utilities
-- Unit testing structure
+- [x] Middleware support  
+- [ ] CLI command runner  
+- [ ] Database migrations  
+- [ ] Dependency injection container  
+- [ ] REST API utilities  
+- [ ] Unit testing structure
 
 ---
 
