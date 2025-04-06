@@ -117,14 +117,54 @@ Supports layout extending and data passing.
 
 ---
 
+## 🧪 Testing
+
+You can run the tests using PHPUnit. First, make sure you have PHPUnit installed via Composer:
+
+```bash
+composer install --dev
+```
+
+To run the tests:
+
+```bash
+composer test
+```
+
+This will run the test suite and show the results.
+
+Tests are located in the `tests/` directory.
+
+---
+
+## 💻 CLI Commands
+
+You can use the CLI tool to generate modules, controllers, and other components automatically.
+
+To create a new module (e.g., category):
+
+```bash
+composer cli category
+```
+
+This will generate:
+
+- Controller files: `items.php`, `item.php`, `create.php`, `update.php`, `delete.php`
+- Model file
+- Routes file
+
+This helps speed up the development process by generating boilerplate code for you.
+
+---
+
 ## 🧪 TODO (Future Plans)
 
 - [x] Middleware support  
-- [ ] CLI command runner  
+- [x] CLI command runner  
+- [x] Unit testing structure
 - [ ] Database migrations  
 - [ ] Dependency injection container  
 - [ ] REST API utilities  
-- [ ] Unit testing structure
 
 ---
 
