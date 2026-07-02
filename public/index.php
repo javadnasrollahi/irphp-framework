@@ -5,7 +5,7 @@ require_once __DIR__ . '/../bootstrap.php';
 use App\Config\Config;
 use App\Core\Router;
 
-$router = new Router(Config::get('auto_routing') ?? false);
+$router = new Router((bool) Config::get('auto_routing'));
 
 // لود همه routeها
 foreach (glob(__DIR__ . '/../routes/*.php') as $file) {

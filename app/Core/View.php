@@ -10,7 +10,7 @@ class View
     {
         $viewFile = static::$viewPath . $view . '.php';
         if (! file_exists($viewFile)) {
-            die("View [$view] not found!");
+            throw new \RuntimeException("View [$view] not found!");
         }
 
         extract($data);
@@ -27,7 +27,7 @@ class View
                 include $layoutFile;
                 return ob_get_clean();
             } else {
-                die("layouts not found!");
+                throw new \RuntimeException("Layout [{$layoutFile}] not found!");
             }
         }
 

@@ -6,11 +6,15 @@
 
 ## 🚀 Features
 
-- Clean MVC structure
-- Simple and customizable routing system (with optional auto-routing)
-- Powerful and fluent HTTP Response system
+- Clean MVC structure with a tiny DI container (auto-wiring via reflection)
+- Routing: GET/POST/PUT/PATCH/DELETE, route groups, named routes, optional auto-routing
+- Request object (no more raw `$_GET`/`$_POST`), fluent Response builder
 - View system with layout/extend support
-- `.env` file support
+- Centralized exception handler (readable errors in dev, safe messages in prod via `APP_DEBUG`)
+- Simple file Logger, rule-based Validator, CSRF middleware
+- Database via Eloquent (`illuminate/database`) — works out of the box with **SQLite, zero config**
+- Migrations (`php cli.php migrate`)
+- CLI generator for modules (`php cli.php make:module Category`)
 - PSR-4 autoloading (Composer ready)
 
 ---
@@ -52,33 +56,50 @@ project/
    composer install
    ```
 
-3. Copy `.env.example` to `.env` and configure your environment variables.
+3. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   The default config uses **SQLite** (`storage/database.sqlite`, auto-created on first run) — no external database setup needed to try the framework. Switch `DB_CONNECTION` to `mysql` in `.env` if you need it.
 
 ---
 
 ## 🖥️ Run the Server
 
-Run the built-in PHP server using:
-
 ```bash
+composer serve
+# or directly:
 php -S 127.0.0.1:8080 -t public
 ```
 
-Visit [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser.
+Visit [http://127.0.0.1:8080](http://127.0.0.1:8080) — you should see the welcome page rendered through the layout system.
+
+Run migrations any time with:
+```bash
+php cli.php migrate
+```
 
 ---
 
 ## 🧩 Routing
 
-Define your routes in `routes/webhook.php` or other route files:
+Define your routes in `routes/web.php` (or add any file in `routes/`, they're all auto-loaded):
 
 ```php
-$router->get('/', 'IndexController@index');
+$router->get('/', 'IndexController@index')->name('home');
+
+$router->group(['prefix' => '/admin', 'middleware' => ['Auth']], function ($router) {
+    $router->get('/dashboard', 'AdminController@dashboard')->name('admin.dashboard');
+});
+
+$router->put('/users/{id}', 'UserController@update');
 ```
 
 Supports:
-- GET, POST, PUT, DELETE methods
-- Optional auto-routing mode (configurable)
+- GET, POST, PUT, PATCH, DELETE methods
+- Route groups (`prefix` + `middleware`) and named routes (`$router->route('admin.dashboard')`)
+- Optional auto-routing mode (`AUTO_ROUTING=true` in `.env`)
+- Controller methods can type-hint `App\Core\Request` to receive the current request
 
 ---
 
@@ -139,32 +160,24 @@ Tests are located in the `tests/` directory.
 
 ## 💻 CLI Commands
 
-You can use the CLI tool to generate modules, controllers, and other components automatically.
-
-To create a new module (e.g., category):
-
 ```bash
-composer cli category
+php cli.php make:module Category     # Controller(s) + Model + routes file
+php cli.php make:migration create_posts_table
+php cli.php migrate
+php cli.php migrate:rollback
+php cli.php serve [host:port]
 ```
-
-This will generate:
-
-- Controller files: `items.php`, `item.php`, `create.php`, `update.php`, `delete.php`
-- Model file
-- Routes file
-
-This helps speed up the development process by generating boilerplate code for you.
 
 ---
 
 ## 🧪 TODO (Future Plans)
 
-- [x] Middleware support  
-- [x] CLI command runner  
+- [x] Middleware support
+- [x] CLI command runner
 - [x] Unit testing structure
-- [ ] Database migrations  
-- [ ] Dependency injection container  
-- [ ] REST API utilities  
+- [x] Database migrations
+- [x] Dependency injection container
+- [ ] REST API utilities
 
 ---
 

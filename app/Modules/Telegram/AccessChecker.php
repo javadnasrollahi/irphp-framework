@@ -1,9 +1,7 @@
 <?php
-namespace App\Middleware;
+namespace App\Modules\Telegram;
 
-use App\Services\BotService;
-
-class MiddlewareHandler
+class AccessChecker
 {
     protected $user;
     protected $chatId;
@@ -15,19 +13,20 @@ class MiddlewareHandler
     }
 
     /**
-     * ✅ بررسی کانال ثبت کردن کاربر
+     * بررسی کانال ثبت‌شده کاربر
      */
-    public function checkUserHashChannels()
+    public function checkUserHashChannels(): bool
     {
-        if (count($this->user["channels_list"]) == 0) {
+        if (count($this->user['channels_list'] ?? []) === 0) {
             BotService::sendMessage($this->chatId, "⚠️ شما هیچ کانالی متصل نکرده‌اید.\nلطفاً یک کانال متصل کنید");
             return false;
         }
         return true;
     }
-    public function checkUserIsAdmin()
+
+    public function checkUserIsAdmin(): bool
     {
-        if (! $this->user["isAdmin"]) {
+        if (empty($this->user['isAdmin'])) {
             BotService::sendMessage($this->chatId, "⚠️ شما مدیر نیستید!");
             return false;
         }
@@ -35,23 +34,23 @@ class MiddlewareHandler
     }
 
     /**
-     * ✅ بررسی تاریخ انقضای کاربر
+     * بررسی تاریخ انقضای اشتراک کاربر
      */
-    public function checkUserSubscription()
+    public function checkUserSubscription(): bool
     {
-        // if ($this->user->expiry_date < now()) {
-        //     BotService::sendMessage($this->chatId, "⛔ اشتراک شما به پایان رسیده است. لطفاً اشتراک خود را تمدید کنید.");
-        //     return false;
-        // }
+        if (! empty($this->user['expiry_date']) && strtotime($this->user['expiry_date']) < time()) {
+            BotService::sendMessage($this->chatId, "⛔ اشتراک شما به پایان رسیده است. لطفاً اشتراک خود را تمدید کنید.");
+            return false;
+        }
         return true;
     }
 
     /**
-     * ✅ بررسی عضویت در کانال تلگرام
+     * بررسی عضویت در کانال تلگرام
      */
-    public function checkChannelSubscription()
+    public function checkChannelSubscription(string $channelUsername = null): bool
     {
-        $channelUsername = "@YourChannel"; // نام کاربری کانال شما
+        $channelUsername = $channelUsername ?? env('REQUIRED_CHANNEL', '@YourChannel');
         $isMember        = BotService::checkUserChannelMembership($this->chatId, $channelUsername);
 
         if (! $isMember) {
@@ -62,18 +61,16 @@ class MiddlewareHandler
     }
 
     /**
-     * ✅ اجرای همه‌ی چک‌ها
+     * اجرای همه‌ی چک‌ها
      */
-    public function runChecks()
+    public function runChecks(): bool
     {
         if (! $this->checkUserSubscription()) {
             return false;
         }
-
         if (! $this->checkChannelSubscription()) {
             return false;
         }
-
         return true;
     }
 }

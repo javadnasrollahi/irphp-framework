@@ -1,19 +1,23 @@
 <?php
-
 namespace App\Services;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use App\Config\Config;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class Database
 {
     public static function init()
     {
+        $dbConfig = Config::get('db');
 
+        if (($dbConfig['driver'] ?? null) === 'sqlite' && ! file_exists($dbConfig['database'])) {
+            @mkdir(dirname($dbConfig['database']), 0777, true);
+            touch($dbConfig['database']);
+        }
 
         $capsule = new Capsule;
 
-        $capsule->addConnection(Config::get('db'));
+        $capsule->addConnection($dbConfig);
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
     }

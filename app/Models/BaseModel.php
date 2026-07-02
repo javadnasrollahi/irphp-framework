@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseModel extends Model
 {
-    protected $guarded = [];    // غیرفعال کردن محافظت از فیلدها
+    // مدل‌های فرزند باید $fillable رو خودشون تعریف کنن، پیش‌فرض هیچی fillable نیست
+    protected $guarded = ['id'];
     public $timestamps = false; // اگر جدول `created_at` و `updated_at` داره
 }
