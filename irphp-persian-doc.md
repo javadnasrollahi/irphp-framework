@@ -7,11 +7,15 @@
 
 ## 🚀 امکانات
 
-- ساختار MVC مرتب و ساده
-- سیستم مسیردهی ساده و قابل تنظیم (با قابلیت Auto-Routing اختیاری)
-- سیستم پاسخ‌دهی HTTP روان و قدرتمند
+- ساختار MVC مرتب با یک DI Container سبک (autowiring از طریق Reflection)
+- مسیردهی: GET/POST/PUT/PATCH/DELETE، گروه‌بندی روت، named route، Auto-Routing اختیاری
+- Request/Response روان به‌جای دسترسی مستقیم به `$_GET`/`$_POST`
 - سیستم View با پشتیبانی از layout و extend
-- پشتیبانی از فایل `.env`
+- مدیریت متمرکز خطاها (پیام خوانا در dev، پیام امن در production با `APP_DEBUG`)
+- Logger ساده، Validator، میدلورهای CSRF، CORS و Rate Limiting
+- دیتابیس با Eloquent؛ به‌صورت پیش‌فرض SQLite بدون نیاز به هیچ پیکربندی
+- Migration (`php cli.php migrate`)
+- ابزار CLI برای ساخت ماژول (`php cli.php make:module`)
 - بارگذاری خودکار کلاس‌ها بر پایه PSR-4 (سازگار با Composer)
 
 ---
@@ -53,33 +57,50 @@ project/
    composer install
    ```
 
-3. فایل `.env.example` را به `.env` کپی کرده و تنظیمات محیطی را انجام دهید.
+3. فایل `.env.example` را به `.env` کپی کنید:
+   ```bash
+   cp .env.example .env
+   ```
+   تنظیمات پیش‌فرض از **SQLite** استفاده می‌کنند (فایل `storage/database.sqlite` به‌صورت خودکار ساخته می‌شود) — برای امتحان فریم‌ورک نیازی به نصب دیتابیس نیست. برای MySQL کافیه `DB_CONNECTION=mysql` رو در `.env` تنظیم کنی.
 
 ---
 
 ## 🖥️ اجرای سرور
 
-برای اجرای سرور داخلی PHP از دستور زیر استفاده کنید:
-
 ```bash
+composer serve
+# یا مستقیم:
 php -S 127.0.0.1:8080 -t public
 ```
 
 سپس مرورگر را باز کرده و وارد آدرس [http://127.0.0.1:8080](http://127.0.0.1:8080) شوید.
 
+برای اجرای migration ها:
+```bash
+php cli.php migrate
+```
+
 ---
 
 ## 🧩 مسیردهی (Routing)
 
-مسیرها را در فایل `routes/webhook.php` تعریف کنید:
+مسیرها را در `routes/web.php` (یا هر فایل دیگه‌ای داخل `routes/`، چون همه به‌صورت خودکار لود میشن) تعریف کنید:
 
 ```php
-$router->get('/', 'IndexController@index');
+$router->get('/', 'IndexController@index')->name('home');
+
+$router->group(['prefix' => '/admin', 'middleware' => ['Auth']], function ($router) {
+    $router->get('/dashboard', 'AdminController@dashboard');
+});
+
+// محدود کردن نرخ درخواست روی یک روت
+$router->get('/api/limited', 'IndexController@api', ['RateLimit:30,60']);
 ```
 
 پشتیبانی از:
-- متدهای GET، POST، PUT، DELETE
-- Auto-Routing اختیاری (قابل تنظیم)
+- متدهای GET، POST، PUT، PATCH، DELETE
+- گروه‌بندی روت (`prefix` + `middleware`) و named route
+- Auto-Routing اختیاری (قابل تنظیم با `AUTO_ROUTING=true`)
 
 ---
 
@@ -138,32 +159,25 @@ composer test
 
 ## 💻 ابزار خط فرمان (CLI)
 
-با استفاده از CLI می‌توانید به‌صورت خودکار ماژول‌ها، کنترلرها و سایر کامپوننت‌ها را بسازید.
-
-برای ساخت یک ماژول جدید (مثلاً category):
-
 ```bash
-composer cli category
+php cli.php make:module Category      # کنترلر(ها) + مدل + فایل روت
+php cli.php make:migration create_posts_table
+php cli.php migrate
+php cli.php migrate:rollback
+php cli.php serve [host:port]
 ```
-
-این دستور فایل‌های زیر را ایجاد می‌کند:
-
-- کنترلرها: `items.php`, `item.php`, `create.php`, `update.php`, `delete.php`
-- فایل مدل
-- فایل روت
-
-این قابلیت به شما در توسعه سریع‌تر کمک می‌کند.
 
 ---
 
 ## 🧪 برنامه‌های آینده
 
-- [x] پشتیبانی از Middleware  
-- [x] ابزار خط فرمان (CLI)  
-- [x] ساختار تست واحد  
-- [ ] مهاجرت دیتابیس (Migration)  
-- [ ] کانتینر تزریق وابستگی (DI Container)  
-- [ ] ابزارهای REST API  
+- [x] پشتیبانی از Middleware
+- [x] ابزار خط فرمان (CLI)
+- [x] ساختار تست واحد
+- [x] مهاجرت دیتابیس (Migration)
+- [x] کانتینر تزریق وابستگی (DI Container)
+- [x] CORS و Rate Limiting
+- [ ] ابزارهای REST API
 
 ---
 

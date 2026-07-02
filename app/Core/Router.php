@@ -131,9 +131,12 @@ class Router
     protected function handle($action, array $middleware, array $params, Request $request)
     {
         foreach ($middleware as $m) {
-            $middlewareClass = "App\\Middleware\\$m";
+            [$name, $argsString] = array_pad(explode(':', $m, 2), 2, null);
+            $middlewareClass     = "App\\Middleware\\$name";
+
             if (class_exists($middlewareClass)) {
-                $this->container->make($middlewareClass)->handle();
+                $args = $argsString ? explode(',', $argsString) : [];
+                call_user_func_array([$this->container->make($middlewareClass), 'handle'], $args);
             }
         }
 

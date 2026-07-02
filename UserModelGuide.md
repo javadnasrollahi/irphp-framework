@@ -8,15 +8,15 @@
 ```php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class User extends Model
+class User extends BaseModel
 {
     protected $table = 'users'; // نام جدول در دیتابیس
     protected $fillable = ['name', 'email', 'password']; // فیلدهای قابل پر شدن
     public $timestamps = true; // اگر جدول `created_at` و `updated_at` دارد
 }
 ```
+
+> در IRPHP مدل‌ها به‌جای `Illuminate\Database\Eloquent\Model` از `App\Models\BaseModel` ارث‌بری می‌کنند. پیش‌فرض `BaseModel` هر فیلدی به‌جز `id` رو fillable در نظر می‌گیره، مگر اینکه مثل بالا `$fillable` رو خودتون صریح تعریف کنید که در این صورت همون لیست ملاک عمل قرار می‌گیره.
 
 ---
 

@@ -4,6 +4,10 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use App\Config\Config;
 use App\Core\Router;
+use App\Middleware\Cors;
+
+// اعمال CORS برای همه‌ی درخواست‌ها (فقط وقتی CORS_ENABLED=true باشه فعاله)
+(new Cors())->handle();
 
 $router = new Router((bool) Config::get('auto_routing'));
 
